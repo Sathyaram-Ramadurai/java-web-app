@@ -5,49 +5,49 @@ pipeline {
         stage('Checkout') {
             steps {
                 // Checkout the source code from the repository
-                git 'https://github.com/Sathyaram-Ramadurai/java-web-app.git'
+                git credentialsId: 'fbea923a-a97c-4dab-b958-7f27c4f8f894', url: 'https://github.com/Sathyaram-Ramadurai/java-web-app.git'
             }
         }
 
         stage('Build') {
             steps {
                 // Build the Java application
-                sh 'mvn clean package'
+                bat 'mvn clean package'
             }
         }
 
         stage('Test') {
             steps {
                 // Run unit tests
-                sh 'mvn test'
+                bat 'mvn test'
             }
         }
 
         stage('Package') {
             steps {
                 // Create a deployable artifact (e.g., WAR or JAR file)
-                sh 'mvn package'
+                bat 'mvn package'
             }
         }
 
        stage('Build Docker Image') {
             steps {
                 // Build the Docker image using the Dockerfile in the repository
-                sh 'docker build -t docker_web_app .'
+                bat 'docker build -t docker_web_app .'
             }
         }
         stage('Push to Docker Registry') {
             steps {
                 // Push the Docker image to a Docker registry (e.g., Docker Hub)
                 withDockerRegistry([credentialsId: 'sathyaramramadurai/docker_java_web_app', url: 'https://hub.docker.com/repository/docker/sathyaramramadurai/docker_java_web_app']) {
-                    sh 'docker push docker_web_app'
+                    bat 'docker push docker_web_app'
                 }
             }
         }
         stage('Deploy') {
             steps {
                 // Deploy the Docker container using the image on a Docker host
-                sh 'docker run -d -p 8090:80 docker_web_app'
+                bat 'docker run -d -p 8090:80 docker_web_app'
             }
         }
     }
