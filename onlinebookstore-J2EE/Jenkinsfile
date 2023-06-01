@@ -36,6 +36,14 @@ pipeline {
                 sh 'docker build -t docker_web_app .'
             }
         }
+        stage('Push to Docker Registry') {
+            steps {
+                // Push the Docker image to a Docker registry (e.g., Docker Hub)
+                withDockerRegistry([credentialsId: 'sathyaramramadurai/docker_java_web_app', url: 'https://hub.docker.com/repository/docker/sathyaramramadurai/docker_java_web_app']) {
+                    sh 'docker push docker_web_app'
+                }
+            }
+        }
         stage('Deploy') {
             steps {
                 // Deploy the Docker container using the image on a Docker host
