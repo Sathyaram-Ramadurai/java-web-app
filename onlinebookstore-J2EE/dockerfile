@@ -1,0 +1,32 @@
+# Base image with Java and Maven
+FROM maven:3.8.4-openjdk-11-slim AS builder
+
+# Set the working directory inside the container
+WORKDIR /app
+
+# Copy the pom.xml and download dependencies
+COPY pom.xml .
+RUN mvn dependency:go-offline -B
+
+# Copy the source code
+COPY OnlineBookStore ./OnlineBookStore
+COPY setup ./setup
+COPY WebContent ./WebContent
+# Build the application
+RUN mvn package
+
+# Final image
+FROM tomcat:8
+
+# Remove the default Tomcat application
+RUN rm -rf /usr/local/tomcat/webapps/*
+
+# Set the working directory inside the container
+WORKDIR /usr/local/tomcat/webapps
+
+# Copy the built WAR file from the builder stage to Tomcat webapps directory
+COPY --from=builder /app/target/onlinebookstore-0.0.1-SNAPSHOT.war .
+
+
+# Start Tomcat and deploy the application
+CMD ["catalina.sh", "run"]
