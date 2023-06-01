@@ -1,0 +1,40 @@
+pipeline {
+    agent any
+
+    stages {
+        stage('Checkout') {
+            steps {
+                // Checkout the source code from the repository
+                git 'https://github.com/Sathyaram-Ramadurai/java-web-app.git'
+            }
+        }
+
+        stage('Build') {
+            steps {
+                // Build the Java application
+                sh 'mvn clean package'
+            }
+        }
+
+        stage('Test') {
+            steps {
+                // Run unit tests
+                sh 'mvn test'
+            }
+        }
+
+        stage('Package') {
+            steps {
+                // Create a deployable artifact (e.g., WAR or JAR file)
+                sh 'mvn package'
+            }
+        }
+
+        stage('Deploy') {
+            steps {
+                // Deploy the application to a web server or container
+                sh 'cp target/onlinebookstore-0.0.1-SNAPSHOT.war /usr/local/tomcat/webapps'
+            }
+        }
+    }
+}
